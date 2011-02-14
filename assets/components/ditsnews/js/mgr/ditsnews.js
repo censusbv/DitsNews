@@ -135,10 +135,35 @@ Ext.extend(Ditsnews, Ext.Component, {
 		this.messageWindowEl.setOpacity(0, true);
 	},
 	showAjaxLoader: function() {
-		this.loadMask.show();
+        // Commented out because chrome has a bug with ExtJS
+		//this.loadMask.show();
+        this.showMessage('<div class="dn-ajax-loading">' + _('loading') + '</div>', true);
+
+		if (Ext.get('dn-ajax-haze')) {
+			var windowSize = getWindowScrollSize();
+			Ext.get('dn-ajax-haze').setStyle({
+				display: 'block',
+				opacity: 0.5
+			});
+
+			Ext.getBody().setStyle({
+				overflow: 'hidden'
+			});
+		}
+
 	},
 	hideAjaxLoader: function() {
-		this.loadMask.hide();
+		//this.loadMask.hide();
+
+        if (Ext.get('dn-ajax-haze')) {
+			Ext.get('dn-ajax-haze').setStyle({
+				display: 'none'
+			});
+
+			Ext.getBody().setStyle({
+				overflow: 'visible'
+			});
+		}
 	},
 	loadPanel: function(panelClass) {
 		this.pageClass = new panelClass();
@@ -162,6 +187,23 @@ Ext.extend(Ditsnews, Ext.Component, {
 	    return '';
     }
 });
+
+function getWindowScrollSize() {
+    var D = document;
+    var y = Math.max(
+        Math.max(D.body.scrollHeight, D.documentElement.scrollHeight),
+        Math.max(D.body.offsetHeight, D.documentElement.offsetHeight),
+        Math.max(D.body.clientHeight, D.documentElement.clientHeight)
+    );
+
+    var x = Math.max(
+        Math.max(D.body.scrollWidth, D.documentElement.scrollWidth),
+        Math.max(D.body.offsetWidth, D.documentElement.offsetWidth),
+        Math.max(D.body.clientWidth, D.documentElement.clientWidth)
+    );
+
+    return {x: x, y: y};
+}
 
 Ext.reg('ditsnews', Ditsnews);
 

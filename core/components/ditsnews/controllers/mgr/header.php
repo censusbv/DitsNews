@@ -1,4 +1,5 @@
 <?php
+$modx->regClientCss($ditsnews->config['assetsUrl'].'css/mgr/style.css');
 $modx->regClientStartupScript($ditsnews->config['jsUrl'].'mgr/extensions.js');
 $modx->regClientStartupScript($ditsnews->config['assetsUrl'].'js/mgr/lexicon.php');
 $modx->regClientStartupScript($ditsnews->config['jsUrl'].'mgr/ditsnews.js');
