@@ -1,12 +1,12 @@
 -------------------
 Component: DitsNews
 -------------------
-Version: 0.1 alpha
-Since: December 24th, 2010
+Version: 0.1 alpha2
+Since: February 14th, 2011
 Author: Dit's Media (info@ditsmedia.nl)
 License: GNU GPLv2 (or later at your option)
 
-This component is a newsletter system for MODx Revolution. It allows you to manage subscribers/groups and send newsletters.
+This component is a newsletter system for MODX Revolution. It allows you to manage subscribers/groups and send newsletters.
 
 ==========================================
  Features
@@ -22,7 +22,7 @@ This component is a newsletter system for MODx Revolution. It allows you to mana
 ==========================================
  Upcoming versions (TODO)
 ==========================================
-* move settings to MODx System Settings
+* move settings to MODX System Settings
 * make message queue batch size editable (fixed at 50 for now)
 * statistics (views, bounces, etc.)
 * handle bounces
@@ -32,7 +32,7 @@ This component is a newsletter system for MODx Revolution. It allows you to mana
 ==========================================
  Requirements
 ==========================================
-* MODx Revolution
+* MODX Revolution
 * FormIt (for subscription form)
 * Cronjobs (or some other method to run a script periodically)
 
@@ -62,6 +62,7 @@ This component is a newsletter system for MODx Revolution. It allows you to mana
 ==========================================
  Example newsletter template
 ==========================================
+[[!ditsnewsPlaceholders?]]
 <html>
 <head>
 <title>My newsletter</title>

@@ -36,7 +36,7 @@ $modx->setLogTarget(XPDO_CLI_MODE ? 'ECHO' : 'HTML');
 
 $modx->loadClass('transport.modPackageBuilder','',false, true);
 $builder = new modPackageBuilder($modx);
-$builder->createPackage('ditsnews','0.1','alpha');
+$builder->createPackage('ditsnews','0.1','alpha2');
 $builder->registerNamespace('ditsnews',false,true,'{core_path}components/ditsnews/');
 
 /* load action/menu */
