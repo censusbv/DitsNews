@@ -8,8 +8,9 @@
 
 //general
 $_lang['ditsnews'] = 'DitsNews';
-$_lang['ditsnews.desc'] = 'Manage your newsletters here.';
+$_lang['ditsnews.desc'] = 'Newsletter manager for MODX';
 $_lang['ditsnews.menu'] = 'Menu';
+$_lang['ditsnews.search...'] = 'Search...';
 
 //newsletters
 $_lang['ditsnews.newsletters'] = 'Newsletters';
@@ -24,6 +25,9 @@ $_lang['ditsnews.newsletters.remove'] = 'Remove newsletter';
 $_lang['ditsnews.newsletters.remove.title'] = 'Remove newsletter?';
 $_lang['ditsnews.newsletters.remove.confirm'] = 'Are you sure you want to remove this newsletter and all it\'s data?';
 $_lang['ditsnews.newsletters.saved'] = 'Newsletter saved (scheduled)';
+$_lang['ditsnews.newsletters.err.save'] = 'Could not save/schedule newsletter';
+$_lang['ditsnews.newsletters.err.nf'] = 'Could not open/find document';
+$_lang['ditsnews.newsletters.err.remove'] = 'Could not remove newsletter';
 
 //groups
 $_lang['ditsnews.groups'] = 'Groups';
@@ -39,6 +43,8 @@ $_lang['ditsnews.groups.remove.title'] = 'Remove group?';
 $_lang['ditsnews.groups.remove.confirm'] = 'Are you sure you want to remove this group? Subscribers won\'t be deleted';
 $_lang['ditsnews.groups.update'] = 'Update group';
 $_lang['ditsnews.groups.saved'] = 'Group saved';
+$_lang['ditsnews.groups.err.nf'] = 'Group not found';
+$_lang['ditsnews.groups.err.save'] = 'Could not save group';
 
 //subscribers
 $_lang['ditsnews.subscribers'] = 'Subscribers';
@@ -46,6 +52,7 @@ $_lang['ditsnews.subscribers.firstname'] = 'First name';
 $_lang['ditsnews.subscribers.lastname'] = 'Last name';
 $_lang['ditsnews.subscribers.company'] = 'Company';
 $_lang['ditsnews.subscribers.email'] = 'Email';
+$_lang['ditsnews.subscribers.signupdate'] = 'Signup date';
 $_lang['ditsnews.subscribers.new'] = 'New subscriber';
 $_lang['ditsnews.subscribers.exportcsv'] = 'Export CSV';
 $_lang['ditsnews.subscribers.importcsv'] = 'Import CSV';
@@ -71,7 +78,9 @@ $_lang['ditsnews.subscribers.remove.title'] = 'Remove subscriber?';
 $_lang['ditsnews.subscribers.remove.confirm'] = 'Are you sure you want to remove this subscriber?';
 $_lang['ditsnews.subscribers.update'] = 'Update subscriber';
 $_lang['ditsnews.subscribers.saved'] = 'Subscriber saved';
-$_lang['ditsnews.subscribers.error'] = 'Error while saving subscriber';
+$_lang['ditsnews.subscribers.err.save'] = 'Error while saving subscriber';
+$_lang['ditsnews.subscribers.err.ae'] = 'A subscriber with the same email address already exists';
+
 
 //settings
 $_lang['ditsnews.settings'] = 'Settings';

@@ -1,13 +1,14 @@
 <?php
-$newsletterId = (int) $_REQUEST['newsletterId'];
-
-$newsletter = $modx->getObject('dnNewsletter', $newsletterId);
+$newsletter = $modx->getObject('dnNewsletter',  $scriptProperties['id']);
 
 if ($newsletter == null) {
-	return $modx->error->failure('Newsletter not found');
+	return $modx->error->failure($modx->lexicon('ditsnews.newsletters.err.nf'));
 }
 
 // Remove newsletter
-$newsletter->remove();
-
-return $modx->error->success('');
+if($newsletter->remove()) {
+    return $modx->error->success('');
+}
+else {
+    return $modx->error->failure($modx->lexicon('ditsnews.newsletters.err.remove'));
+}

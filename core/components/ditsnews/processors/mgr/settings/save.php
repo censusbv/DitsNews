@@ -10,10 +10,7 @@ $settings->fromArray(array(
     'id' => 1,
     'name' => $settingsArray['name'],
     'email' => $settingsArray['email'],    
-    'bounceemail' => $settingsArray['bounceemail'],
-    'confirmpage' => (int) $settingsArray['confirmpage'],
-    'unsubscribepage' => (int) $settingsArray['unsubscribepage'],
-    'template' => (int) $settingsArray['template']
+    'bounceemail' => $settingsArray['bounceemail']
 ));
 
 // Return values

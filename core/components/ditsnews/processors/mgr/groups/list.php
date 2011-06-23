@@ -30,9 +30,11 @@ foreach ($groups as $group) {
         $c = $modx->newQuery('dnGroupSubscribers');
         $c->where( array('group' => $group->get('id')) );
         $members = $modx->getCount('dnGroupSubscribers', $c);
-
         $group = $group->toArray();
         $group['members'] = (int)$members;
         $list[] = $group;
+}
+if($_REQUEST['includeAll']) {
+    array_unshift($list, array('id' => 0, 'name' => '--- '.$modx->lexicon('ditsnews.groups').' ---'));
 }
 return $this->outputArray($list,$count);

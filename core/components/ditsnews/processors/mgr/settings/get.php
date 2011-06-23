@@ -6,9 +6,6 @@ if($settings == null){
     $settings->set('name', 'Your name');
     $settings->set('email', 'your@email.tld');
     $settings->set('bounceemail', 'your@email.tld');
-    $settings->set('confirmpage', 1);
-    $settings->set('unsubscribepage', 1);
-    $settings->set('template', 1);
     $settings->save();
 }
 

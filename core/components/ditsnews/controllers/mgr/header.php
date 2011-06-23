@@ -1,23 +1,15 @@
 <?php
-$modx->regClientCss($ditsnews->config['assetsUrl'].'css/mgr/style.css');
-$modx->regClientStartupScript($ditsnews->config['jsUrl'].'mgr/extensions.js');
-$modx->regClientStartupScript($ditsnews->config['assetsUrl'].'js/mgr/lexicon.php');
+/**
+ * Loads the header for mgr pages.
+ *
+ * @package ditsnews
+ * @subpackage controllers
+ */
 $modx->regClientStartupScript($ditsnews->config['jsUrl'].'mgr/ditsnews.js');
-$modx->regClientStartupScript($ditsnews->config['assetsUrl'].'js/mgr/config.php');
-$modx->regClientStartupScript($ditsnews->config['jsUrl'].'mgr/stores.js');
+$modx->regClientStartupHTMLBlock('<script type="text/javascript">
+Ext.onReady(function() {
+    Ditsnews.config = '.$modx->toJSON($ditsnews->config).';
+});
+</script>');
 
-switch($_REQUEST['action']) {
-    case 'groups':
-        $modx->regClientStartupScript($ditsnews->config['jsUrl'].'mgr/page_groups.js');
-        break;
-    case 'subscribers':
-        $modx->regClientStartupScript($ditsnews->config['jsUrl'].'mgr/page_subscribers.js');
-        break;
-    case 'settings':
-        $modx->regClientStartupScript($ditsnews->config['jsUrl'].'mgr/page_settings.js');
-        break;
-    default:
-      $modx->regClientStartupScript($ditsnews->config['jsUrl'].'mgr/page_newsletters.js');
-      break;
-}
 return '';

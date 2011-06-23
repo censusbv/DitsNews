@@ -8,8 +8,9 @@
 
 //general
 $_lang['ditsnews'] = 'DitsNews';
-$_lang['ditsnews.desc'] = 'Beheer nieuwsbrieven.';
+$_lang['ditsnews.desc'] = 'Nieuwsbrief systeem voor MODX.';
 $_lang['ditsnews.menu'] = 'Menu';
+$_lang['ditsnews.search...'] = 'Zoeken...';
 
 //newsletters
 $_lang['ditsnews.newsletters'] = 'Nieuwsbrieven';
@@ -24,6 +25,9 @@ $_lang['ditsnews,newsletters.remove'] = 'Verwijder nieuwsbrief';
 $_lang['ditsnews.newsletters.remove.title'] = 'Verwijder nieuwsbrief?';
 $_lang['ditsnews.newsletters.remove.confirm'] = 'Weet u zeker dat u deze nieuwsbrief en alle bijbehorende data wilt verwijderen?';
 $_lang['ditsnews.newsletters.saved'] = 'Nieuwsbrief opgeslagen (ingepland)';
+$_lang['ditsnews.newsletters.err.save'] = 'Kan nieuwsbrief niet opslaan/inplannen';
+$_lang['ditsnews.newsletters.err.nf'] = 'Kan document niet openen';
+$_lang['ditsnews.newsletters.err.remove'] = 'Kan nieuwsbrief niet verwijderen';
 
 //groups
 $_lang['ditsnews.groups'] = 'Groepen';
@@ -38,6 +42,8 @@ $_lang['ditsnews.groups.remove.title'] = 'Verwijder groep?';
 $_lang['ditsnews.groups.remove.confirm'] = 'Weet u zeker dat u deze groep wilt verwijderen? Abonnees worden niet verwijderd.';
 $_lang['ditsnews.groups.update'] = 'Groep bijwerken';
 $_lang['ditsnews.groups.saved'] = 'Groep opgeslagen';
+$_lang['ditsnews.groups.err.nf'] = 'Groep niet gevonden';
+$_lang['ditsnews.groups.err.save'] = 'Kan group niet opslaan';
 
 //subscribers
 $_lang['ditsnews.subscribers'] = 'Abonnees';
@@ -45,6 +51,7 @@ $_lang['ditsnews.subscribers.firstname'] = 'Voornaam';
 $_lang['ditsnews.subscribers.lastname'] = 'Achternaam';
 $_lang['ditsnews.subscribers.company'] = 'Organisatie';
 $_lang['ditsnews.subscribers.email'] = 'E-mail';
+$_lang['ditsnews.subscribers.signupdate'] = 'Aanmeldingsdatum';
 $_lang['ditsnews.subscribers.new'] = 'Nieuwe abonnee';
 $_lang['ditsnews.subscribers.exportcsv'] = 'Exporteer CSV';
 $_lang['ditsnews.subscribers.importcsv'] = 'Importeer CSV';
@@ -70,7 +77,9 @@ $_lang['ditsnews.subscribers.remove.title'] = 'Verwijder abonnee?';
 $_lang['ditsnews.subscribers.remove.confirm'] = 'Weet u zeker dat u deze abonnee wilt verwijderen?';
 $_lang['ditsnews.subscribers.update'] = 'Abonnee bijwerken';
 $_lang['ditsnews.subscribers.saved'] = 'Abonnee opgeslagen';
-$_lang['ditsnews.subscribers.error'] = 'Fout bij opslaan van abonnee';
+$_lang['ditsnews.subscribers.err.save'] = 'Fout bij opslaan van abonnee';
+$_lang['ditsnews.subscribers.err.ae'] = 'Er bestaat al een abonnee met dit e-mailadres';
+
 
 //settings
 $_lang['ditsnews.settings'] = 'Instellingen';

@@ -9,7 +9,6 @@ require_once MODX_CORE_PATH . 'model/modx/modrequest.class.php';
  * @extends modRequest
  */
 class ditsnewsControllerRequest extends modRequest {
-    public $discuss = null;
     public $actionVar = 'action';
     public $defaultAction = 'index';
 
@@ -30,16 +29,6 @@ class ditsnewsControllerRequest extends modRequest {
         /* save page to manager object. allow custom actionVar choice for extending classes. */
         $this->action = isset($_REQUEST[$this->actionVar]) ? $_REQUEST[$this->actionVar] : $this->defaultAction;
 
-        return $this->_prepareResponse();
-    }
-
-    /**
-     * Prepares the MODx response to a mgr request that is being handled.
-     *
-     * @access public
-     * @return boolean True if the response is properly prepared.
-     */
-    protected function _prepareResponse() {
         $modx =& $this->modx;
         $ditsnews =& $this->ditsnews;
         $viewHeader = include $this->ditsnews->config['corePath'].'controllers/mgr/header.php';
@@ -48,7 +37,7 @@ class ditsnewsControllerRequest extends modRequest {
         if (file_exists($f)) {
             $viewOutput = include $f;
         } else {
-            $viewOutput = 'Action not found: '.$f;
+            $viewOutput = 'Controller not found: '.$f;
         }
 
         return $viewHeader.$viewOutput;

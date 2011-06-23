@@ -22,7 +22,6 @@ $sources= array (
     'source_assets' => $root.'assets/components/ditsnews',
     'docs' => $root.'core/components/ditsnews/docs/',
 );
-
 unset($root); // save memory
 
 require_once dirname(__FILE__) . '/build.config.php';
@@ -36,7 +35,7 @@ $modx->setLogTarget(XPDO_CLI_MODE ? 'ECHO' : 'HTML');
 
 $modx->loadClass('transport.modPackageBuilder','',false, true);
 $builder = new modPackageBuilder($modx);
-$builder->createPackage('ditsnews','0.1','alpha2');
+$builder->createPackage('ditsnews','0.2.0','alpha1');
 $builder->registerNamespace('ditsnews',false,true,'{core_path}components/ditsnews/');
 
 /* load action/menu */
@@ -97,6 +96,12 @@ $vehicle->resolve('file',array(
 $vehicle->resolve('file',array(
     'source' => $sources['source_assets'],
     'target' => "return MODX_ASSETS_PATH . 'components/';",
+));
+$vehicle->resolve('php',array(
+    'source' => $sources['resolvers'].'postactions.dbchanges.php',
+));
+$vehicle->resolve('php',array(
+    'source' => $sources['resolvers'].'postactions.resolver.php',
 ));
 $builder->putVehicle($vehicle);
 

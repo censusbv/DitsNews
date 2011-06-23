@@ -1,4 +1,7 @@
 <?php
+/**
+ * @package ditsnews
+ */
 class Ditsnews {
     /**
      * Constructs the Ditsnews object
@@ -6,14 +9,12 @@ class Ditsnews {
      * @param modX &$modx A reference to the modX object
      * @param array $config An array of configuration options
      */
-
-    var $errormsg = array();
-    
     function __construct(modX &$modx,array $config = array()) {
         $this->modx =& $modx;
 
         $basePath = $this->modx->getOption('ditsnews.core_path',$config,$this->modx->getOption('core_path').'components/ditsnews/');
         $assetsUrl = $this->modx->getOption('ditsnews.assets_url',$config,$this->modx->getOption('assets_url').'components/ditsnews/');
+
         $this->config = array_merge(array(
             'basePath' => $basePath,
             'corePath' => $basePath,
@@ -23,7 +24,7 @@ class Ditsnews {
             'jsUrl' => $assetsUrl.'js/',
             'cssUrl' => $assetsUrl.'css/',
             'assetsUrl' => $assetsUrl,
-            'connectorUrl' => $assetsUrl.'connector.php'
+            'connectorUrl' => $assetsUrl.'connector.php',
         ),$config);
 
         $this->modx->addPackage('ditsnews',$this->config['modelPath']);
@@ -40,121 +41,138 @@ class Ditsnews {
     public function initialize($ctx = 'web') {
         switch ($ctx) {
             case 'mgr':
-                $this->modx->regClientStartupHTMLBlock('<script type="text/javascript">var siteId = \''.$this->modx->site_id.'\';</script>');
-
-                if (!$this->modx->loadClass('ditsnews.request.ditsnewsControllerRequest',$this->config['modelPath'],true,true)) {
+                if (!$this->modx->loadClass('ditsnewsControllerRequest',$this->config['modelPath'].'ditsnews/request/',true,true)) {
                     return 'Could not load controller request handler.';
                 }
                 $this->request = new ditsnewsControllerRequest($this);
                 return $this->request->handleRequest();
             break;
-            case 'connector':
-                if (!$this->modx->loadClass('ditsnews.request.ditsnewsConnectorRequest',$this->config['modelPath'],true,true)) {
-                    echo 'Could not load connector request handler.'; die();
-                }
-                $this->request = new ditsnewsConnectorRequest($this);
-                return $this->request->handle();
-            break;
-            default: break;
         }
         return true;
     }
 
-    public function queueMessages($newsletterId, $documentId, $groups) {
-        //publish document
-        $doc = $this->modx->getObject('modResource', $documentId);
-        $doc->set('published', 1);
-        $doc->save();
-        $this->modx->switchContext($doc->get('context_key'));        
-        unset($doc);
+    //Sets placeholders of newsletter template
+    public function setPlaceholders($scriptProperties) {
 
-        //get settings
+        $placeholderTags = array(
+            'firstname'     => $this->modx->getOption('firstnameTag', $scriptProperties, 'firstname'),
+            'lastname'      => $this->modx->getOption('lastnameTag', $scriptProperties, 'lastname'),
+            'fullname'      => $this->modx->getOption('fullnameTag', $scriptProperties, 'fullname'),
+            'company'       => $this->modx->getOption('companyTag', $scriptProperties, 'company'),
+            'email'         => $this->modx->getOption('emailTag', $scriptProperties, 'email'),
+            'unsubscribe'   => $this->modx->getOption('unsubscribeTag', $scriptProperties, 'unsubscribe')
+        );
+
+        //change standard placeholders to entities ([[ to &#91;&#91; and ]] to &#93;&#93;), including default value
+        if($_GET['sending']) {
+            $this->modx->setPlaceholders(array(
+                $placeholderTags['firstname'] => '&#91;&#91;+firstname:default=`'.$this->modx->getOption('firstnameDefault', $scriptProperties, '').'`&#93;&#93;',
+                $placeholderTags['lastname'] => '&#91;&#91;+lastname:default=`'.$this->modx->getOption('lastnameDefault', $scriptProperties, '').'`&#93;&#93;',
+                $placeholderTags['fullname'] => '&#91;&#91;+fullname:default=`'.$this->modx->getOption('fullnameDefault', $scriptProperties, '').'`&#93;&#93;',
+                $placeholderTags['company'] => '&#91;&#91;+company:default=`'.$this->modx->getOption('companyDefault', $scriptProperties, '').'`&#93;&#93;',
+                $placeholderTags['email'] => '&#91;&#91;+email:default=`'.$this->modx->getOption('emailDefault', $scriptProperties, '').'`&#93;&#93;'
+            ));
+        }
+        else {
+            $this->modx->setPlaceholders(array(
+                $placeholderTags['firstname'] => $this->modx->getOption('firstnameDefault', $scriptProperties, ''),
+                $placeholderTags['lastname'] => $this->modx->getOption('lastnameDefault', $scriptProperties, ''),
+                $placeholderTags['fullname'] => $this->modx->getOption('fullnameDefault', $scriptProperties, ''),
+                $placeholderTags['company'] => $this->modx->getOption('companyDefault', $scriptProperties, ''),
+                $placeholderTags['email'] => $this->modx->getOption('emailDefault', $scriptProperties, '')
+            ));
+        }
+    }
+
+    public function processQueue() {
+
+        $c = $this->modx->newQuery('dnQueue');
+        $c->limit(50);
+        $c->where( array('sent' => 0) );
+        $queue = $this->modx->getCollection('dnQueue', $c);
+
         $settings = $this->modx->getObject('dnSettings', 1);
-
-        //get content
-        $docUrl = preg_replace('/&amp;/', '&', $this->modx->makeUrl((int)$documentId, '', '&smartytags=1', 'full') );
-        $message = file_get_contents( $docUrl );
-
-        //get CSS
-        $cssStyles = '';
-        preg_match_all('|<style(.*)>(.*)</style>|isU', $message, $css);
-        if( !empty($css[2]) )
-        {
-            foreach( $css[2] as $cssblock )
-            {
-                $cssStyles .= $cssblock;
-            }
+        if(!is_object($settings)) {
+            die('settings not found');
         }
 
-        $sentTo = array(); //used to check if not already sent to an email address (same user in other group)
+        $this->modx->getService('mail', 'mail.modPHPMailer');
 
-        foreach( $groups as $group )
-        {
-            $c = $this->modx->newQuery('dnSubscriber');
-            $c->leftJoin('dnGroupSubscribers', 'dn', 'dnSubscriber.id = dn.subscriber');
-            $c->where( array( 'dn.group' => $group, 'dnSubscriber.active' => 1 ) );
-            $subscribers = $this->modx->getCollection('dnSubscriber', $c);
+        foreach($queue as $qitem) {
+            $newsletter = $qitem->getOne('Newsletter');
+            $subscriber = $qitem->getOne('Subscriber');
+            $message = $newsletter->get('message');
 
-            foreach($subscribers as $subscriber)
-            {
-                if( !in_array($subscriber->get('email'), $sentTo) )
-                {
-                    $myMessage = $message;
+            $this->modx->setPlaceholders(array(
+                'firstname' => $subscriber->get('firstname'),
+                'lastname' => $subscriber->get('lastname'),
+                'fullname' => $subscriber->get('firstname').' '.$subscriber->get('lastname'),
+                'company' => $subscriber->get('company'),
+                'email' => $subscriber->get('email'),
+                'code' => $subscriber->get('code')
+            ));            
 
-                    //replace local links and images; add domain
-                    $myMessage = preg_replace_callback('|<a(?:.+?)href\=\"(\S+)\"|',array( $this, 'parseUrls' ),$myMessage);
-                    $myMessage = preg_replace_callback('|<img(?:.+?)src\=\"(\S+)\"|',array( $this, 'parseUrls' ),$myMessage);
+            //get message including parsed placeholders
+            $chunk = $this->modx->newObject('modChunk');
+            $chunk->setContent($message);
+            $message = $chunk->process();
+            unset($chunk);
 
-                    //parse smarty 'placeholders'
-                    $this->modx->smarty->left_delimiter = '{{';
-                    $this->modx->smarty->right_delimiter = '}}';
-                    $this->modx->smarty->assign('firstname',  $subscriber->get('firstname'));
-                    $this->modx->smarty->assign('lastname',  $subscriber->get('lastname'));
-                    $this->modx->smarty->assign('fullname',  trim($subscriber->get('firstname').' '.$subscriber->get('lastname')));
-                    $this->modx->smarty->assign('company',  $subscriber->get('company'));
-                    $this->modx->smarty->assign('email',  $subscriber->get('email'));
-                    $this->modx->smarty->assign('unsubscribe',  $this->modx->makeUrl($settings->get('unsubscribepage'), '', '?subscriber='.$subscriber->get('id').'&code='.$subscriber->get('code')));
-                    $myMessage = $this->modx->smarty->fetch('string: '.$myMessage);
+            $dom = new DOMDocument('1.0', 'utf-8');
+            $dom->loadHTML($message);
 
-                    // CSS inline
-                    $Emogrifier = new Emogrifier($myMessage, $cssStyles);
-                    $myMessage = $Emogrifier->emogrify();
+            //get site_url from base tag or default MODX setting
+            $site_url = $dom->getElementsByTagName('base')->item(0)->getAttribute('href');
+            if(empty($site_url)) {
+                $site_url = $this->modx->getOption('site_url');
+            }
 
-                    $queueItem = $this->modx->newObject('dnQueue');
-                    $queueItem->set('newsletter',   $newsletterId);
-                    $queueItem->set('to', 		    $subscriber->get('email'));
-                    $queueItem->set('message', 	    $myMessage);
-                    $queueItem->set('sent',		    0);
-                    $queueItem->save();
-
-                    $sentTo[] = $subscriber->get('email');
+            //convert local link URLs to full URLs
+            $links = $dom->getElementsByTagName('a');
+            foreach($links as $link) {
+                if( $href = $link->getAttribute('href') ) {
+                    if(substr($href, 0, 7) != 'http://' && substr($href, 0, 7) != 'mailto:') {
+                        $newhref = $site_url.$href;
+                        //add tracking vars
+                        $newhref .= ( strpos($newhref, '?') ? '&amp;' : '?' );
+                        $newhref .= 'nwl='.$qitem->get('newsletter');
+                        $newhref .= '&amp;s='.$subscriber->get('id');
+                        $newhref .= '&amp;c='.$subscriber->get('code');
+                        $link->setAttribute('href',$newhref);
+                    }
                 }
             }
+
+            //convert local image URLs to full URLs
+            $images = $dom->getElementsByTagName('img');
+            foreach($images as $image) {
+                if($src = $image->getAttribute('src')) {
+                   if(substr($src, 0, 7) != 'http://') {
+                        $image->setAttribute('src', $site_url.$src);
+                   }
+                }
+            }
+            $message = $dom->saveHTML();
+
+            $this->modx->mail->set(modMail::MAIL_BODY,      $message);
+            $this->modx->mail->set(modMail::MAIL_FROM,      $settings->get('email') );
+            $this->modx->mail->set(modMail::MAIL_FROM_NAME, $settings->get('name') );
+            $this->modx->mail->set(modMail::MAIL_SENDER,    $settings->get('bounceemail'));
+            $this->modx->mail->set(modMail::MAIL_SUBJECT,   $newsletter->get('title'));
+            $this->modx->mail->address('to',                $subscriber->get('email'));
+            $this->modx->mail->setHTML(true);
+            if (!$this->modx->mail->send()) {
+                $this->modx->log(modX::LOG_LEVEL_ERROR,'An error occurred while trying to send newsletter to'.$subscriber->get('email'));
+            }
+            $this->modx->mail->reset();
+
+            //update status
+            $qitem->set('sent', 1);
+            $qitem->save();
         }
-        return count($sentTo).' emails added to queue.';
-	}
-    
-    private function parseUrls($match)
-	{
-	    //echo 'Complete match: '.$match[0].PHP_EOL;
-	    //echo 'Matched URL: '.$match[1].PHP_EOL;
+    }
 
-        $siteurl = $this->modx->config['site_url'];
-
-        //skip ubsubscribe and external links
-	    if( stripos($match[1], '{{$unsubscribe}}') !== false || stripos($match[1], 'http://') !== false || stripos($match[1], 'https://') !==false || stripos($match[1], 'mailto:') !== false )
-	    {
-	        return $match[0];
-	    }
-	    else
-	    {
-	        $replace = $match[1]; //text to replace
-	        $replaced = $siteurl.( substr($match[1], 0, 1) == '/' ? '' : '/' ).$match[1]; //replaced url
-	        return str_replace($replace, $replaced, $match[0]);
-	    }
-	}
-
-    public function signup($fields)
+    public function signup($fields, $confirmPage=0)
     {
         if( !$this->checkUniqueEmail($fields['email']) ) {
             $this->errormsg[] = $this->modx->lexicon('ditsnews.subscribers.signup.err.emailunique');
@@ -165,6 +183,7 @@ class Ditsnews {
 		$subscriber->fromArray($fields);
 		$subscriber->set('code', md5( time().$fields['firstname'].$fields['lastname'] ));
 		$subscriber->set('active', 0);
+        $subscriber->set('signupdate', time());
         $subscriber->save();
 
         //add subscriber to selected groups
@@ -188,7 +207,7 @@ class Ditsnews {
         $settings = $this->modx->getObject('dnSettings', 1);
 
         //sent confirm message
-        $confirmUrl =  $this->modx->makeUrl($settings->get('confirmpage'), '', '?subscriber='.$subscriber->get('id').'&amp;code='.$subscriber->get('code'), 'full');
+        $confirmUrl =  $this->modx->makeUrl($confirmPage, '', '?s='.$subscriber->get('id').'&amp;c='.$subscriber->get('code'), 'full');
 
         $message = $this->modx->getChunk('ditsnewssignupmail', array('confirmUrl' => $confirmUrl, 'firstname' => $subscriber->get('firstname'), 'lastname' => $subscriber->get('lastname')));
 
@@ -234,9 +253,9 @@ class Ditsnews {
      */
     public function confirmSignup()
 	{
-		$subscriber = $this->modx->getObject('dnSubscriber', (int)$_GET['subscriber']);
+		$subscriber = $this->modx->getObject('dnSubscriber', (int)$_GET['s']);
 
-		if( $subscriber && $subscriber->get('code') == $_GET['code'] )
+		if( $subscriber && $subscriber->get('code') == $_GET['c'] )
 		{
 			$subscriber->set('active', 1);
 			$subscriber->save();
@@ -255,9 +274,9 @@ class Ditsnews {
      */
     public function unsubscribe()
 	{
-		$subscriber = $this->modx->getObject('dnSubscriber', (int)$_GET['subscriber']);
+		$subscriber = $this->modx->getObject('dnSubscriber', (int)$_GET['s']);
 
-		if( $subscriber && $subscriber->get('code') == $_GET['code'] )
+		if( $subscriber && $subscriber->get('code') == $_GET['c'] )
 		{
 			$subscriber->remove();
 			return true;
@@ -267,41 +286,6 @@ class Ditsnews {
 			return false;
 		}
 	}
-
-    /**
-     * Process email queue and send messages.
-     * @access public
-     */
-    public function processQueue()
-    {
-       $this->modx->getService('mail', 'mail.modPHPMailer');
-
-       $settings = $this->modx->getObject('dnSettings', 1);
-
-       $c = $this->modx->newQuery('dnQueue');
-       $c->limit(50);
-       $c->where( array('sent' => 0) );
-       $queue = $this->modx->getCollection('dnQueue', $c);
-       foreach($queue as $qitem)
-       {
-           $nwl = $this->modx->getObject('dnNewsletter',   $qitem->get('newsletter'));
-           $this->modx->mail->set(modMail::MAIL_BODY,      $qitem->get('message'));
-           $this->modx->mail->set(modMail::MAIL_FROM,      $settings->get('email') );
-           $this->modx->mail->set(modMail::MAIL_FROM_NAME, $settings->get('name') );
-           $this->modx->mail->set(modMail::MAIL_SENDER,    $settings->get('bounceemail'));
-           $this->modx->mail->set(modMail::MAIL_SUBJECT,   $nwl->get('title'));
-           $this->modx->mail->address('to',                $qitem->get('to'));
-           $this->modx->mail->setHTML(true);
-           if (!$this->modx->mail->send()) {
-               $this->modx->log(modX::LOG_LEVEL_ERROR,'An error occurred while trying to send the email: '.$err);
-           }
-           $this->modx->mail->reset();
-
-           //update status
-           $qitem->set('sent', 1);
-           $qitem->save();
-       }
-   }
 
     /**
      * Gets a Chunk and caches it; also falls back to file-based templates
@@ -317,7 +301,7 @@ class Ditsnews {
         if (!isset($this->chunks[$name])) {
             $chunk = $this->_getTplChunk($name);
             if (empty($chunk)) {
-                $chunk = $this->modx->getObject('modChunk',array('name' => $name),true);
+                $chunk = $this->modx->getObject('modChunk',array('name' => $name));
                 if ($chunk == false) return false;
             }
             $this->chunks[$name] = $chunk->getContent();
@@ -333,13 +317,14 @@ class Ditsnews {
      * Returns a modChunk object from a template file.
      *
      * @access private
-     * @param string $name The name of the Chunk. Will parse to name.chunk.tpl
+     * @param string $name The name of the Chunk. Will parse to name.$postfix
+     * @param string $postfix The default postfix to search for chunks at.
      * @return modChunk/boolean Returns the modChunk object if found, otherwise
      * false.
      */
-    private function _getTplChunk($name) {
+    private function _getTplChunk($name,$postfix = '.chunk.tpl') {
         $chunk = false;
-        $f = $this->config['chunksPath'].strtolower($name).'.chunk.tpl';
+        $f = $this->config['chunksPath'].strtolower($name).$postfix;
         if (file_exists($f)) {
             $o = file_get_contents($f);
             $chunk = $this->modx->newObject('modChunk');

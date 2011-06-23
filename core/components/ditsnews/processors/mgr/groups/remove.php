@@ -1,10 +1,8 @@
 <?php
-$groupId = (int) $_REQUEST['groupId'];
-
-$group = $modx->getObject('dnGroup', $groupId);
+$group = $modx->getObject('dnGroup', $scriptProperties['id']);
 
 if ($group == null) {
-	return $modx->error->failure('Group not found');
+	return $modx->error->failure($modx->lexicon('ditsnews.groups.err.nf'));
 }
 
 // Remove group

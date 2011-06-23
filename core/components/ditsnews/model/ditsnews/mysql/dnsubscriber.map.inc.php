@@ -12,6 +12,14 @@ $xpdo_meta_map['dnSubscriber']= array (
       'cardinality' => 'many',
       'owner' => 'local',
     ),
+    'Queue' => 
+    array (
+      'class' => 'dnQueue',
+      'local' => 'id',
+      'foreign' => 'subscriber',
+      'cardinality' => 'many',
+      'owner' => 'local',
+    ),
   ),
   'fields' => 
   array (
@@ -21,6 +29,7 @@ $xpdo_meta_map['dnSubscriber']= array (
     'email' => '',
     'code' => '',
     'active' => 0,
+    'signupdate' => 0,
   ),
   'fieldMeta' => 
   array (
@@ -70,6 +79,14 @@ $xpdo_meta_map['dnSubscriber']= array (
       'dbtype' => 'int',
       'precision' => '1',
       'phptype' => 'integer',
+      'null' => false,
+      'default' => 0,
+    ),
+    'signupdate' => 
+    array (
+      'dbtype' => 'int',
+      'precision' => '20',
+      'phptype' => 'timestamp',
       'null' => false,
       'default' => 0,
     ),

@@ -12,12 +12,19 @@ $xpdo_meta_map['dnQueue']= array (
       'cardinality' => 'one',
       'owner' => 'foreign',
     ),
+    'Subscriber' => 
+    array (
+      'class' => 'dnSubscriber',
+      'local' => 'subscriber',
+      'foreign' => 'id',
+      'cardinality' => 'one',
+      'owner' => 'foreign',
+    ),
   ),
   'fields' => 
   array (
     'newsletter' => 0,
-    'to' => '',
-    'message' => '',
+    'subscriber' => 0,
     'sent' => 0,
   ),
   'fieldMeta' => 
@@ -32,20 +39,15 @@ $xpdo_meta_map['dnQueue']= array (
       'default' => 0,
       'index' => 'index',
     ),
-    'to' => 
+    'subscriber' => 
     array (
-      'dbtype' => 'varchar',
-      'precision' => '255',
-      'phptype' => 'string',
+      'dbtype' => 'int',
+      'precision' => '10',
+      'attributes' => 'unsigned',
+      'phptype' => 'integer',
       'null' => false,
-      'default' => '',
-    ),
-    'message' => 
-    array (
-      'dbtype' => 'text',
-      'phptype' => 'string',
-      'null' => false,
-      'default' => '',
+      'default' => 0,
+      'index' => 'index',
     ),
     'sent' => 
     array (

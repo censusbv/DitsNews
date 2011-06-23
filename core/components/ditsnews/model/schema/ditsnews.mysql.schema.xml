@@ -5,17 +5,14 @@
         <composite alias="Queue" class="dnQueue" local="id" foreign="newsletter" cardinality="many" owner="local" />
         <field key="title" dbtype="varchar" precision="255" phptype="string" null="false" default="" />
         <field key="date" dbtype="int" precision="20" phptype="timestamp" null="false" default="" />
-        <field key="document" dbtype="int" precision="10" phptype="integer" null="false" default="0" />
+        <field key="message" dbtype="text" phptype="string" null="false" default="" />
     </object>
 
     <object class="dnSettings" table="ditsnews_settings" extends="xPDOSimpleObject">
         <field key="name" dbtype="varchar" precision="255" phptype="string" null="false" default="" />
         <field key="email" dbtype="varchar" precision="255" phptype="string" null="false" default="0" />
         <field key="bounceemail" dbtype="varchar" precision="255" phptype="string" null="false" default="0" />
-        <field key="confirmpage" dbtype="int" precision="10" phptype="integer" null="false" default="0" />
-        <field key="unsubscribepage" dbtype="int" precision="10" phptype="integer" null="false" default="0" />
-        <field key="template" dbtype="int" precision="10" phptype="integer" null="false" default="0" />
-		
+
         <validation>
              <rule field="name"
                    name="preventBlank"
@@ -44,13 +41,15 @@
 	
     <object class="dnSubscriber" table="ditsnews_subscribers" extends="xPDOSimpleObject">
 		<composite alias="Groups" class="dnGroupSubscribers" local="id" foreign="subscriber" cardinality="many" owner="local" />
-
+        <composite alias="Queue" class="dnQueue" local="id" foreign="subscriber" cardinality="many" owner="local" />
+        
 		<field key="firstname" dbtype="varchar" precision="255" phptype="string" null="false" default="" />
 		<field key="lastname" dbtype="varchar" precision="255" phptype="string" null="false" default="" />
 		<field key="company" dbtype="varchar" precision="255" phptype="string" null="false" default="" />
         <field key="email" dbtype="varchar" precision="255" phptype="string" null="false" default="" index="unique" />
 		<field key="code" dbtype="varchar" precision="32" phptype="string" null="false" default="" />
 		<field key="active" dbtype="int" precision="1" phptype="integer" null="false" default="0" />
+        <field key="signupdate" dbtype="int" precision="20" phptype="timestamp" null="false" default="" />
 
         <validation>
               <rule
@@ -68,7 +67,7 @@
 		<composite alias="Subscribers" class="dnGroupSubscribers" local="id" foreign="group"  cardinality="many" owner="local" />
 
 		<field key="name" dbtype="varchar" precision="255" phptype="string" null="false" default="" />
-                <field key="public" dbtype="int" precision="1" phptype="integer" null="false" default="0" />
+        <field key="public" dbtype="int" precision="1" phptype="integer" null="false" default="0" />
 
 		        <validation>
                      <rule field="name"
@@ -91,9 +90,9 @@
 	
     <object class="dnQueue" table="ditsnews_queue" extends="xPDOSimpleObject">
         <aggregate alias="Newsletter" class="dnNewsletter" local="newsletter" foreign="id" cardinality="one" owner="foreign" />
+        <aggregate alias="Subscriber" class="dnSubscriber" local="subscriber" foreign="id" cardinality="one" owner="foreign" />
         <field key="newsletter" dbtype="int" precision="10" attributes="unsigned" phptype="integer" null="false" default="0" index="index" />
-        <field key="to" dbtype="varchar" precision="255" phptype="string" null="false" default="" />
-        <field key="message" dbtype="text" phptype="string" null="false" default="" />
+        <field key="subscriber" dbtype="int" precision="10" attributes="unsigned" phptype="integer" null="false" default="0" index="index" />
 	    <field key="sent" dbtype="tinyint" precision="1" attributes="unsigned" phptype="integer" null="false" default="0" />
     </object>
 	

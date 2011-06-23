@@ -7,9 +7,6 @@ $xpdo_meta_map['dnSettings']= array (
     'name' => '',
     'email' => '0',
     'bounceemail' => '0',
-    'confirmpage' => 0,
-    'unsubscribepage' => 0,
-    'template' => 0,
   ),
   'fieldMeta' => 
   array (
@@ -36,30 +33,6 @@ $xpdo_meta_map['dnSettings']= array (
       'phptype' => 'string',
       'null' => false,
       'default' => '0',
-    ),
-    'confirmpage' => 
-    array (
-      'dbtype' => 'int',
-      'precision' => '10',
-      'phptype' => 'integer',
-      'null' => false,
-      'default' => 0,
-    ),
-    'unsubscribepage' => 
-    array (
-      'dbtype' => 'int',
-      'precision' => '10',
-      'phptype' => 'integer',
-      'null' => false,
-      'default' => 0,
-    ),
-    'template' => 
-    array (
-      'dbtype' => 'int',
-      'precision' => '10',
-      'phptype' => 'integer',
-      'null' => false,
-      'default' => 0,
     ),
   ),
   'validation' => 
