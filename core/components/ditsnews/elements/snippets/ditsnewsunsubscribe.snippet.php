@@ -1,4 +1,4 @@
-w<?php
+<?php
 require_once MODX_CORE_PATH.'/components/ditsnews/model/ditsnews/ditsnews.class.php';
 $ditsnews = new Ditsnews($modx);
 

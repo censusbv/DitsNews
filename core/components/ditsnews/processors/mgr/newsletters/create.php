@@ -11,6 +11,21 @@ if($doc = $modx->getObject('modResource', $scriptProperties['document'])) {
     $message = str_replace('&#91;&#91;', '[[', $message); //convert entities back to normal placeholders
     $message = str_replace('&#93;&#93;', ']]', $message); //convert entities back to normal placeholders
 
+    //CSS inline
+    $modx->getService('emogrifier', 'Emogrifier', $modx->getOption('core_path').'components/ditsnews/model/emogrifier/');
+    $cssStyles = '';
+    preg_match_all('|<style(.*)>(.*)</style>|isU', $message, $css);
+    if( !empty($css[2]) )
+    {
+        foreach( $css[2] as $cssblock )
+        {
+            $cssStyles .= $cssblock;
+        }
+    }
+    $modx->emogrifier->setCSS($cssStyles);
+    $modx->emogrifier->setHTML($message);
+    $message = $modx->emogrifier->emogrify();
+
     $newsletter = $modx->newObject('dnNewsletter', array(
         'title' => $scriptProperties['title'],
         'date' => time(),
