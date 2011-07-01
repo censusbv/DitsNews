@@ -103,19 +103,17 @@ class Ditsnews {
             $subscriber = $qitem->getOne('Subscriber');
             $message = $newsletter->get('message');
 
-            $this->modx->setPlaceholders(array(
+            //get message including parsed placeholders
+            $chunk = $this->modx->newObject('modChunk');
+            $chunk->setContent($message);
+            $message = $chunk->process(array(
                 'firstname' => $subscriber->get('firstname'),
                 'lastname' => $subscriber->get('lastname'),
                 'fullname' => $subscriber->get('firstname').' '.$subscriber->get('lastname'),
                 'company' => $subscriber->get('company'),
                 'email' => $subscriber->get('email'),
                 'code' => $subscriber->get('code')
-            ));            
-
-            //get message including parsed placeholders
-            $chunk = $this->modx->newObject('modChunk');
-            $chunk->setContent($message);
-            $message = $chunk->process();
+            ));
             unset($chunk);
 
             $dom = new DOMDocument('1.0', 'utf-8');
