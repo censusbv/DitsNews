@@ -33,21 +33,20 @@ $_lang['ditsnews.newsletters.err.wrongext'] = 'Недопустимый тип �
 $_lang['ditsnews.newsletters.err.fexists'] = 'Файл с таким именем уже существует';
 
 //groups
-$_lang['ditsnews.groups'] = 'Groups';
-$_lang['ditsnews.groups.name'] = 'Name';
-$_lang['ditsnews.groups.public'] = 'Public';
-$_lang['ditsnews.groups.public.desc'] = 'Public (allow subscription through form)';
-$_lang['ditsnews.groups.members'] = 'Members';
-$_lang['ditsnews.groups.members'] = 'Members';
-$_lang['ditsnews.groups.new'] = 'New group';
-$_lang['ditsnews.groups.edit'] = 'Edit group';
-$_lang['ditsnews.groups.remove'] = 'Remove group';
-$_lang['ditsnews.groups.remove.title'] = 'Remove group?';
-$_lang['ditsnews.groups.remove.confirm'] = 'Are you sure you want to remove this group? Subscribers won\'t be deleted';
-$_lang['ditsnews.groups.update'] = 'Update group';
-$_lang['ditsnews.groups.saved'] = 'Group saved';
-$_lang['ditsnews.groups.err.nf'] = 'Group not found';
-$_lang['ditsnews.groups.err.save'] = 'Could not save group';
+$_lang['ditsnews.groups'] = 'Группы';
+$_lang['ditsnews.groups.name'] = 'Имя';
+$_lang['ditsnews.groups.public'] = 'Общий';
+$_lang['ditsnews.groups.public.desc'] = 'Общий (можно подписаться самостоятельно)';
+$_lang['ditsnews.groups.members'] = 'Участник';
+$_lang['ditsnews.groups.new'] = 'Новая группа';
+$_lang['ditsnews.groups.edit'] = 'Изменить группу';
+$_lang['ditsnews.groups.remove'] = 'Удалить группу';
+$_lang['ditsnews.groups.remove.title'] = 'Удалить группу?';
+$_lang['ditsnews.groups.remove.confirm'] = 'Вы уверены, что хотите удалить эту группу? Участники группы не будут удалены.';
+$_lang['ditsnews.groups.update'] = 'Обновить группу';
+$_lang['ditsnews.groups.saved'] = 'Группа сохранена';
+$_lang['ditsnews.groups.err.nf'] = 'Группа не найдена';
+$_lang['ditsnews.groups.err.save'] = 'Не могу сохранить группу';
 
 //subscribers
 $_lang['ditsnews.subscribers'] = 'Подписчики';
