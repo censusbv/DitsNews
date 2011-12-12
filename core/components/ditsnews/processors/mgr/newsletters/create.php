@@ -62,7 +62,7 @@ if($doc = $modx->getObject('modResource', $scriptProperties['document'])) {
 			return $modx->error->failure($modx->lexicon('ditsnews.newsletters.err.wrongext'));
 		}
 
-		// clear filename by clear alias algorithm
+		// clear filename by clear alias algorithm from modResource
 		$options = array();
         $charset = strtoupper((string) $modx->getOption('modx_charset', $options, 'UTF-8'));
         $delimiter = $modx->getOption('friendly_alias_word_delimiter', $options, '-');
@@ -90,6 +90,11 @@ if($doc = $modx->getObject('modResource', $scriptProperties['document'])) {
 		if (file_exists($filepath.$name)) {
 			return $modx->error->failure($modx->lexicon('ditsnews.newsletters.err.fexists'));
 		}
+
+		if (!is_dir($filepath)) {
+			mkdir($filepath);
+		}
+
         if (move_uploaded_file($tname, $filepath.$name)) {
 			$newsletter->set('attachment', $name);
 		}
