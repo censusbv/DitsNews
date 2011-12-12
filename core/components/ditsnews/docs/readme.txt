@@ -1,7 +1,7 @@
 -------------------
 Component: DitsNews
 -------------------
-Version: 0.2.0 alpha3
+Version: 0.2.0 alpha4
 Since: June, 23rd, 2011
 Author: Dit's Media (info@ditsmedia.nl)
 License: GNU GPLv2 (or later at your option)

@@ -2,9 +2,9 @@
 $xpdo_meta_map['dnNewsletter']= array (
   'package' => 'ditsnews',
   'table' => 'ditsnews_newsletters',
-  'composites' => 
+  'composites' =>
   array (
-    'Queue' => 
+    'Queue' =>
     array (
       'class' => 'dnQueue',
       'local' => 'id',
@@ -13,15 +13,16 @@ $xpdo_meta_map['dnNewsletter']= array (
       'owner' => 'local',
     ),
   ),
-  'fields' => 
+  'fields' =>
   array (
     'title' => '',
     'date' => 0,
     'message' => '',
+    'attachment' => '',
   ),
-  'fieldMeta' => 
+  'fieldMeta' =>
   array (
-    'title' => 
+    'title' =>
     array (
       'dbtype' => 'varchar',
       'precision' => '255',
@@ -29,7 +30,7 @@ $xpdo_meta_map['dnNewsletter']= array (
       'null' => false,
       'default' => '',
     ),
-    'date' => 
+    'date' =>
     array (
       'dbtype' => 'int',
       'precision' => '20',
@@ -37,9 +38,17 @@ $xpdo_meta_map['dnNewsletter']= array (
       'null' => false,
       'default' => 0,
     ),
-    'message' => 
+    'message' =>
     array (
       'dbtype' => 'text',
+      'phptype' => 'string',
+      'null' => false,
+      'default' => '',
+    ),
+    'attachment' =>
+    array (
+      'dbtype' => 'varchar',
+      'precision' => '255',
       'phptype' => 'string',
       'null' => false,
       'default' => '',

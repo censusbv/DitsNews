@@ -6,6 +6,7 @@
         <field key="title" dbtype="varchar" precision="255" phptype="string" null="false" default="" />
         <field key="date" dbtype="int" precision="20" phptype="timestamp" null="false" default="" />
         <field key="message" dbtype="text" phptype="string" null="false" default="" />
+        <field key="attachment" dbtype="varchar" precision="255" phptype="string" null="false" default="" />
     </object>
 
     <object class="dnSettings" table="ditsnews_settings" extends="xPDOSimpleObject">
@@ -38,11 +39,11 @@
          </validation>
 
     </object>
-	
+
     <object class="dnSubscriber" table="ditsnews_subscribers" extends="xPDOSimpleObject">
 		<composite alias="Groups" class="dnGroupSubscribers" local="id" foreign="subscriber" cardinality="many" owner="local" />
         <composite alias="Queue" class="dnQueue" local="id" foreign="subscriber" cardinality="many" owner="local" />
-        
+
 		<field key="firstname" dbtype="varchar" precision="255" phptype="string" null="false" default="" />
 		<field key="lastname" dbtype="varchar" precision="255" phptype="string" null="false" default="" />
 		<field key="company" dbtype="varchar" precision="255" phptype="string" null="false" default="" />
@@ -62,7 +63,7 @@
         </validation>
 
     </object>
-	
+
     <object class="dnGroup" table="ditsnews_groups" extends="xPDOSimpleObject">
 		<composite alias="Subscribers" class="dnGroupSubscribers" local="id" foreign="group"  cardinality="many" owner="local" />
 
@@ -79,7 +80,7 @@
                       />
                 </validation>
     </object>
-	
+
     <object class="dnGroupSubscribers" table="ditsnews_groups_subscribers" extends="xPDOSimpleObject">
         <aggregate alias="Subscriber" class="dnSubscriber" local="subscriber" foreign="id" cardinality="one" owner="foreign" />
         <aggregate alias="Group" class="dnGroup" local="group" foreign="id" cardinality="one" owner="foreign" />
@@ -87,7 +88,7 @@
         <field key="subscriber" dbtype="int" precision="10" attributes="unsigned" phptype="integer" null="false" default="0" index="index" />
         <field key="group" dbtype="int" precision="10" attributes="unsigned" phptype="integer" null="false" default="0" index="index" />
     </object>
-	
+
     <object class="dnQueue" table="ditsnews_queue" extends="xPDOSimpleObject">
         <aggregate alias="Newsletter" class="dnNewsletter" local="newsletter" foreign="id" cardinality="one" owner="foreign" />
         <aggregate alias="Subscriber" class="dnSubscriber" local="subscriber" foreign="id" cardinality="one" owner="foreign" />
@@ -95,5 +96,5 @@
         <field key="subscriber" dbtype="int" precision="10" attributes="unsigned" phptype="integer" null="false" default="0" index="index" />
 	    <field key="sent" dbtype="tinyint" precision="1" attributes="unsigned" phptype="integer" null="false" default="0" />
     </object>
-	
+
 </model>

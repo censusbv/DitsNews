@@ -17,6 +17,7 @@ $_lang['ditsnews.newsletters'] = 'Newsletters';
 $_lang['ditsnews.newsletters.subject'] = 'Subject';
 $_lang['ditsnews.newsletters.date'] = 'Date';
 $_lang['ditsnews.newsletters.document'] = 'Document';
+$_lang['ditsnews.newsletters.attachment'] = 'Attachment';
 $_lang['ditsnews.newsletters.total'] = 'Total';
 $_lang['ditsnews.newsletters.sent'] = 'Sent';
 $_lang['ditsnews.newsletters.new'] = 'New newsletter';
@@ -28,6 +29,8 @@ $_lang['ditsnews.newsletters.saved'] = 'Newsletter saved (scheduled)';
 $_lang['ditsnews.newsletters.err.save'] = 'Could not save/schedule newsletter';
 $_lang['ditsnews.newsletters.err.nf'] = 'Could not open/find document';
 $_lang['ditsnews.newsletters.err.remove'] = 'Could not remove newsletter';
+$_lang['ditsnews.newsletters.err.wrongext'] = 'This file has the wrong type';
+$_lang['ditsnews.newsletters.err.fexists'] = 'This file already exists';
 
 //groups
 $_lang['ditsnews.groups'] = 'Groups';
