@@ -96,12 +96,14 @@ class Ditsnews {
             die('settings not found');
         }
 
+		$attachments_dir = $this->modx->getOption('assets_path').'components/ditsnews/attachments/';
         $this->modx->getService('mail', 'mail.modPHPMailer');
 
         foreach($queue as $qitem) {
             $newsletter = $qitem->getOne('Newsletter');
             $subscriber = $qitem->getOne('Subscriber');
             $message = $newsletter->get('message');
+            $attachment = $newsletter->get('attachment');
 
             //get message including parsed placeholders
             $chunk = $this->modx->newObject('modChunk');
@@ -159,6 +161,9 @@ class Ditsnews {
             $this->modx->mail->set(modMail::MAIL_SUBJECT,   $newsletter->get('title'));
             $this->modx->mail->address('to',                $subscriber->get('email'));
             $this->modx->mail->setHTML(true);
+            if (!empty($attachment)) {
+				$this->modx->mail->attach($attachments_dir.$attachment, $attachment);
+			}
             if (!$this->modx->mail->send()) {
                 $this->modx->log(modX::LOG_LEVEL_ERROR,'An error occurred while trying to send newsletter to'.$subscriber->get('email'));
             }
