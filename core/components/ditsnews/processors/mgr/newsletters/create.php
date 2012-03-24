@@ -28,10 +28,15 @@ if($doc = $modx->getObject('modResource', $scriptProperties['document'])) {
 			$placeholders['tv.'.$tv->get('name')] = $tv->get('value');
         }
 		
-		// replace only the known placeholders of the resource
-		foreach ($placeholders as $name => $value) {
-			$message = str_replace('[[+'.$name.']]', $value, $message);
+		// replace ditsnews placeholders
+		$ditsnews_placeholders = array('firstname','lastname','fullname','company','email','unsubscribe');
+		foreach ($ditsnews_placeholders as $value) {
+			$message = str_replace('[[+'.$value, '&#91;&#91;+'.$value, $message);
 		}
+		
+		$chunk = $this->modx->newObject('modChunk');
+		$chunk->setContent($message);
+		$message = $chunk->process($placeholders);
 		
 	} else {
 		$docUrl = preg_replace('/&amp;/', '&', $modx->makeUrl($id_resource, '', '&sending=1', 'full') );
@@ -41,10 +46,10 @@ if($doc = $modx->getObject('modResource', $scriptProperties['document'])) {
 		unset($context);
 		
 		$message = file_get_contents($docUrl);
-		//convert entities back to normal placeholders
-		$message = str_replace('&#91;&#91;', '[[', $message); 
-		$message = str_replace('&#93;&#93;', ']]', $message);
 	}
+	//convert entities back to normal placeholders
+	$message = str_replace('&#91;&#91;', '[[', $message); 
+	$message = str_replace('&#93;&#93;', ']]', $message);
 	
     //CSS inline
     $modx->getService('emogrifier', 'Emogrifier', $modx->getOption('core_path').'components/ditsnews/model/emogrifier/');
