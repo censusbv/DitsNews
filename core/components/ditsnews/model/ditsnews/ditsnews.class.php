@@ -91,9 +91,11 @@ class Ditsnews {
         $c->where( array('sent' => 0) );
         $queue = $this->modx->getCollection('dnQueue', $c);
 
-        $settings = $this->modx->getObject('dnSettings', 1);
-        if(!is_object($settings)) {
-            die('settings not found');
+        // $settings = $this->modx->getObject('dnSettings', 1);
+		$settings = $this->getSettings();
+        if(sizeof($settings)==0) {
+			$this->modx->log(modX::LOG_LEVEL_ERROR,'ditsnews settings not found ');
+            die('ditsnews settings not found');
         }
 
         $this->modx->getService('mail', 'mail.modPHPMailer');
@@ -153,9 +155,9 @@ class Ditsnews {
             $message = $dom->saveHTML();
 
             $this->modx->mail->set(modMail::MAIL_BODY,      $message);
-            $this->modx->mail->set(modMail::MAIL_FROM,      $settings->get('email') );
-            $this->modx->mail->set(modMail::MAIL_FROM_NAME, $settings->get('name') );
-            $this->modx->mail->set(modMail::MAIL_SENDER,    $settings->get('bounceemail'));
+            $this->modx->mail->set(modMail::MAIL_FROM,      $settings['email'] );
+            $this->modx->mail->set(modMail::MAIL_FROM_NAME, $settings['name'] );
+            $this->modx->mail->set(modMail::MAIL_SENDER,    $settings['bounceemail']);
             $this->modx->mail->set(modMail::MAIL_SUBJECT,   $newsletter->get('title'));
             $this->modx->mail->address('to',                $subscriber->get('email'));
             $this->modx->mail->setHTML(true);
@@ -201,8 +203,16 @@ class Ditsnews {
             unset($dnGroupSubscribers);
         }
 
+		
         //get settings
-        $settings = $this->modx->getObject('dnSettings', 1);
+        // $settings = $this->modx->getObject('dnSettings', 1);
+		$settings = $this->getSettings();
+        if(sizeof($settings)==0) {
+			$this->modx->log(modX::LOG_LEVEL_ERROR,'ditsnews settings not found ');
+            die('ditsnews settings not found');
+        }
+
+        // $settings = $this->modx->getObject('dnSettings', 1);
 
         //sent confirm message
         $confirmUrl =  $this->modx->makeUrl($confirmPage, '', '?s='.$subscriber->get('id').'&amp;c='.$subscriber->get('code'), 'full');
@@ -211,12 +221,12 @@ class Ditsnews {
 
         $this->modx->getService('mail', 'mail.modPHPMailer');
         $this->modx->mail->set(modMail::MAIL_BODY, $message);
-        $this->modx->mail->set(modMail::MAIL_FROM, $settings->get('email') );
-        $this->modx->mail->set(modMail::MAIL_FROM_NAME, $settings->get('name') );
-        $this->modx->mail->set(modMail::MAIL_SENDER, $settings->get('name') );
+        $this->modx->mail->set(modMail::MAIL_FROM, $settings['email'] );
+        $this->modx->mail->set(modMail::MAIL_FROM_NAME, $settings['name'] );
+        $this->modx->mail->set(modMail::MAIL_SENDER, $settings['name'] );
         $this->modx->mail->set(modMail::MAIL_SUBJECT, $this->modx->lexicon('ditsnews.subscribers.confirm.subject'));
         $this->modx->mail->address('to', $subscriber->get('email') );
-        $this->modx->mail->address('reply-to', $settings->get('email') );
+        $this->modx->mail->address('reply-to', $settings['email'] );
         $this->modx->mail->setHTML(true);
         if (!$this->modx->mail->send()) {
              $this->modx->log(modX::LOG_LEVEL_ERROR,'An error occurred while trying to send the confirmation email to '.$subscriber->get('email'));
@@ -330,5 +340,19 @@ class Ditsnews {
             $chunk->setContent($o);
         }
         return $chunk;
+    }
+    /**
+     * Returns settings from modSystemSetting.
+     *
+     * @access public
+     * @return Array of settings
+     */
+    public function getSettings() {
+		$get_settings = $this->modx->getCollection('modSystemSetting', array('namespace' => 'ditsnews'));
+		$settings = array();
+		foreach ( $get_settings as $setting ) {
+			$settings[$setting->get('key')] = $setting->get('value');
+		}
+        return $settings;
     }
 }
