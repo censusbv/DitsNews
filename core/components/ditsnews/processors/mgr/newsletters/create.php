@@ -10,7 +10,8 @@ if($doc = $modx->getObject('modResource', $scriptProperties['document'])) {
 	$chunktpl = $setting->get('value');
 		
 	if ( $chunktpl != '' ) {
-		$message = $modx->getChunk($chunktpl)->getContent();
+		$chunk = $modx->getObject('modChunk', array('name' => $chunktpl));
+		$message = $chunk->getContent();
 		
 		// get resource to placeholders
 		$resource = $modx->getObject('modResource', $id_resource);
