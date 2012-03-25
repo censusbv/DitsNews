@@ -108,14 +108,18 @@ class Ditsnews {
             //get message including parsed placeholders
             $chunk = $this->modx->newObject('modChunk');
             $chunk->setContent($message);
-            $message = $chunk->process(array(
-                'firstname' => $subscriber->get('firstname'),
-                'lastname' => $subscriber->get('lastname'),
-                'fullname' => $subscriber->get('firstname').' '.$subscriber->get('lastname'),
-                'company' => $subscriber->get('company'),
-                'email' => $subscriber->get('email'),
-                'code' => $subscriber->get('code')
-            ));
+			
+			// because emogrifier converts all characters to html-entities we convert all placeholders too
+			$ditsnews_placeholders = array('firstname','lastname','fullname','company','email','unsubscribe');
+			$placeholders_array = array();
+			foreach ($ditsnews_placeholders as $val) {
+				$get_value = $subscriber->get($val);
+				$encoding = mb_detect_encoding($get_value);
+				$converted = mb_convert_encoding($get_value, 'HTML-ENTITIES', $encoding);
+				$placeholders_array[$val] => $converted;
+			}
+			
+            $message = $chunk->process($placeholders_array);
             unset($chunk);
 
             $dom = new DOMDocument('1.0', 'utf-8');
