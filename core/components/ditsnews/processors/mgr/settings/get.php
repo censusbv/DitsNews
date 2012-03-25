@@ -2,8 +2,8 @@
 $settings_values = array();
 $allSettingsArray = array(
 	'name' => 'Your name',
-	'email' => 'your@email.tld',
-	'bounceemail' => 'your@email.tld',
+	'email' => $modx->getOption('emailsender'),
+	'bounceemail' => $modx->getOption('emailsender'),
 	'chunktpl' => '',
 	'chunksignupmail' => 'ditsnewssignupmail'
 );
