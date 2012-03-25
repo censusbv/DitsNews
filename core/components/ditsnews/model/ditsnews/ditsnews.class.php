@@ -122,8 +122,10 @@ class Ditsnews {
             $dom->loadHTML($message);
 
             //get site_url from base tag or default MODX setting
-            $site_url = $dom->getElementsByTagName('base')->item(0)->getAttribute('href');
-            if(empty($site_url)) {
+            $site_url = $dom->getElementsByTagName('base')->item(0);
+            if($site_url) {
+				$site_url = $site_url->getAttribute('href');
+			} else {
                 $site_url = $this->modx->getOption('site_url');
             }
 

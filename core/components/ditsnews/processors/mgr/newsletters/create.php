@@ -34,9 +34,21 @@ if($doc = $modx->getObject('modResource', $scriptProperties['document'])) {
 			$message = str_replace('[[+'.$value, '&#91;&#91;+'.$value, $message);
 		}
 		
-		$chunk = $this->modx->newObject('modChunk');
+		$chunk = $modx->newObject('modChunk');
+		$chunk->setCacheable(false);
 		$chunk->setContent($message);
 		$message = $chunk->process($placeholders);
+		
+		$modx->resource =& $resource;
+		
+		// get the max iterations tags are processed before processing is terminated 
+		$maxIterations= (integer) $modx->getOption('parser_max_iterations', null, 10);
+
+		// parse all cacheable tags first 
+		$modx->getParser()->processElementTags('', $message, true, false, '[[', ']]', array(), $maxIterations);
+
+		// parse all non-cacheable and remove unprocessed tags 
+		$modx->getParser()->processElementTags('', $message, true, true, '[[', ']]', array(), $maxIterations);
 		
 	} else {
 		$docUrl = preg_replace('/&amp;/', '&', $modx->makeUrl($id_resource, '', '&sending=1', 'full') );
