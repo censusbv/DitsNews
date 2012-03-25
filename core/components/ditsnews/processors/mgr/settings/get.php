@@ -4,7 +4,8 @@ $allSettingsArray = array(
 	'name' => 'Your name',
 	'email' => 'your@email.tld',
 	'bounceemail' => 'your@email.tld',
-	'chunktpl' => ''
+	'chunktpl' => '',
+	'chunksignupmail' => 'ditsnewssignupmail'
 );
 
 foreach($allSettingsArray as $key => $default_value) {

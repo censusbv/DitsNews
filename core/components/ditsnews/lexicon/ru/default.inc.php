@@ -87,6 +87,7 @@ $_lang['ditsnews.settings.name'] = 'Имя';
 $_lang['ditsnews.settings.email'] = 'Email';
 $_lang['ditsnews.settings.bounceemail'] = 'Email адрес для возврата писем';
 $_lang['ditsnews.settings.chunktpl'] = 'Имя чанка с шаблоном письма (если пусто берется шаблон ресурса)';
+$_lang['ditsnews.settings.chunksignupmail'] = 'Имя чанка с шаблоном для подтверждения подписки';
 $_lang['ditsnews.settings.confirmpage'] = 'Страница подтверждения';
 $_lang['ditsnews.settings.unsubscribepage'] = 'Страница отписки от рассылки';
 $_lang['ditsnews.settings.template'] = 'Шаблон';

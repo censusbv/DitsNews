@@ -5,7 +5,8 @@ $allSettingsArray = array(
     'name' => $settingsArray['name'],
     'email' => $settingsArray['email'],    
     'bounceemail' => $settingsArray['bounceemail'],
-	'chunktpl' => $settingsArray['chunktpl']
+	'chunktpl' => $settingsArray['chunktpl'],
+	'chunksignupmail' => $settingsArray['chunksignupmail']
 );
 
 foreach($allSettingsArray as $key => $value) {

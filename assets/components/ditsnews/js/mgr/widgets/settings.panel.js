@@ -59,6 +59,12 @@ Ditsnews.panel.Settings = function(config) {
                     fieldLabel: _('ditsnews.settings.chunktpl'),
                     name: 'chunktpl',
                     allowBlank: true
+                },
+                {
+                    xtype: 'textfield',
+                    fieldLabel: _('ditsnews.settings.chunksignupmail'),
+                    name: 'chunksignupmail',
+                    allowBlank: true
                 }
             ]
         }]

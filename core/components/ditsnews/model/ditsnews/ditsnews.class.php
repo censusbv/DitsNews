@@ -91,7 +91,6 @@ class Ditsnews {
         $c->where( array('sent' => 0) );
         $queue = $this->modx->getCollection('dnQueue', $c);
 
-        // $settings = $this->modx->getObject('dnSettings', 1);
 		$settings = $this->getSettings();
         if(sizeof($settings)==0) {
 			$this->modx->log(modX::LOG_LEVEL_ERROR,'ditsnews settings not found ');
@@ -215,19 +214,16 @@ class Ditsnews {
 
 		
         //get settings
-        // $settings = $this->modx->getObject('dnSettings', 1);
 		$settings = $this->getSettings();
         if(sizeof($settings)==0) {
 			$this->modx->log(modX::LOG_LEVEL_ERROR,'ditsnews settings not found ');
             die('ditsnews settings not found');
         }
 
-        // $settings = $this->modx->getObject('dnSettings', 1);
-
         //sent confirm message
         $confirmUrl =  $this->modx->makeUrl($confirmPage, '', '?s='.$subscriber->get('id').'&amp;c='.$subscriber->get('code'), 'full');
 
-        $message = $this->modx->getChunk('ditsnewssignupmail', array('confirmUrl' => $confirmUrl, 'firstname' => $subscriber->get('firstname'), 'lastname' => $subscriber->get('lastname')));
+        $message = $this->modx->getChunk($settings['chunksignupmail'], array('confirmUrl' => $confirmUrl, 'firstname' => $subscriber->get('firstname'), 'lastname' => $subscriber->get('lastname')));
 
         $this->modx->getService('mail', 'mail.modPHPMailer');
         $this->modx->mail->set(modMail::MAIL_BODY, $message);
