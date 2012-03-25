@@ -116,7 +116,7 @@ class Ditsnews {
 				$get_value = $subscriber->get($val);
 				$encoding = mb_detect_encoding($get_value);
 				$converted = mb_convert_encoding($get_value, 'HTML-ENTITIES', $encoding);
-				$placeholders_array[$val] => $converted;
+				$placeholders_array[$val] = $converted;
 			}
 			
             $message = $chunk->process($placeholders_array);
