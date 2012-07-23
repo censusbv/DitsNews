@@ -91,9 +91,10 @@ class Ditsnews {
         $c->where( array('sent' => 0) );
         $queue = $this->modx->getCollection('dnQueue', $c);
 
-        $settings = $this->modx->getObject('dnSettings', 1);
-        if(!is_object($settings)) {
-            die('settings not found');
+		$settings = $this->getSettings();
+        if(sizeof($settings)==0) {
+			$this->modx->log(modX::LOG_LEVEL_ERROR,'ditsnews settings not found ');
+            die('ditsnews settings not found');
         }
 
         $this->modx->getService('mail', 'mail.modPHPMailer');
@@ -106,22 +107,32 @@ class Ditsnews {
             //get message including parsed placeholders
             $chunk = $this->modx->newObject('modChunk');
             $chunk->setContent($message);
-            $message = $chunk->process(array(
+			
+			// because emogrifier converts all characters to html-entities we also convert all placeholders
+			$ditsnews_placeholders = array(
                 'firstname' => $subscriber->get('firstname'),
                 'lastname' => $subscriber->get('lastname'),
                 'fullname' => $subscriber->get('firstname').' '.$subscriber->get('lastname'),
                 'company' => $subscriber->get('company'),
                 'email' => $subscriber->get('email'),
                 'code' => $subscriber->get('code')
-            ));
+            );
+			foreach ($ditsnews_placeholders as $key => $val) {
+				$encoding = mb_detect_encoding($val);
+				$ditsnews_placeholders[$key] = mb_convert_encoding($val, 'HTML-ENTITIES', $encoding);
+			}
+			
+            $message = $chunk->process($ditsnews_placeholders);
             unset($chunk);
 
             $dom = new DOMDocument('1.0', 'utf-8');
             $dom->loadHTML($message);
 
             //get site_url from base tag or default MODX setting
-            $site_url = $dom->getElementsByTagName('base')->item(0)->getAttribute('href');
-            if(empty($site_url)) {
+            $site_url = $dom->getElementsByTagName('base')->item(0);
+            if($site_url) {
+				$site_url = $site_url->getAttribute('href');
+			} else {
                 $site_url = $this->modx->getOption('site_url');
             }
 
@@ -129,8 +140,12 @@ class Ditsnews {
             $links = $dom->getElementsByTagName('a');
             foreach($links as $link) {
                 if( $href = $link->getAttribute('href') ) {
-                    if(substr($href, 0, 7) != 'http://' && substr($href, 0, 7) != 'mailto:') {
-                        $newhref = $site_url.$href;
+                    if(substr($href, 0, 7) != 'mailto:') {
+                        //add tracking vars for all urls
+						$newhref = $href;
+						if(substr($href, 0, 7) != 'http://') {
+							$newhref = $site_url.$href;
+						}
                         //add tracking vars
                         $newhref .= ( strpos($newhref, '?') ? '&amp;' : '?' );
                         $newhref .= 'nwl='.$qitem->get('newsletter');
@@ -153,9 +168,9 @@ class Ditsnews {
             $message = $dom->saveHTML();
 
             $this->modx->mail->set(modMail::MAIL_BODY,      $message);
-            $this->modx->mail->set(modMail::MAIL_FROM,      $settings->get('email') );
-            $this->modx->mail->set(modMail::MAIL_FROM_NAME, $settings->get('name') );
-            $this->modx->mail->set(modMail::MAIL_SENDER,    $settings->get('bounceemail'));
+            $this->modx->mail->set(modMail::MAIL_FROM,      $settings['email'] );
+            $this->modx->mail->set(modMail::MAIL_FROM_NAME, $settings['name'] );
+            $this->modx->mail->set(modMail::MAIL_SENDER,    $settings['bounceemail']);
             $this->modx->mail->set(modMail::MAIL_SUBJECT,   $newsletter->get('title'));
             $this->modx->mail->address('to',                $subscriber->get('email'));
             $this->modx->mail->setHTML(true);
@@ -201,22 +216,27 @@ class Ditsnews {
             unset($dnGroupSubscribers);
         }
 
+		
         //get settings
-        $settings = $this->modx->getObject('dnSettings', 1);
+		$settings = $this->getSettings();
+        if(sizeof($settings)==0) {
+			$this->modx->log(modX::LOG_LEVEL_ERROR,'ditsnews settings not found ');
+            die('ditsnews settings not found');
+        }
 
         //sent confirm message
         $confirmUrl =  $this->modx->makeUrl($confirmPage, '', '?s='.$subscriber->get('id').'&amp;c='.$subscriber->get('code'), 'full');
 
-        $message = $this->modx->getChunk('ditsnewssignupmail', array('confirmUrl' => $confirmUrl, 'firstname' => $subscriber->get('firstname'), 'lastname' => $subscriber->get('lastname')));
+        $message = $this->modx->getChunk($settings['chunksignupmail'], array('confirmUrl' => $confirmUrl, 'firstname' => $subscriber->get('firstname'), 'lastname' => $subscriber->get('lastname')));
 
         $this->modx->getService('mail', 'mail.modPHPMailer');
         $this->modx->mail->set(modMail::MAIL_BODY, $message);
-        $this->modx->mail->set(modMail::MAIL_FROM, $settings->get('email') );
-        $this->modx->mail->set(modMail::MAIL_FROM_NAME, $settings->get('name') );
-        $this->modx->mail->set(modMail::MAIL_SENDER, $settings->get('name') );
+        $this->modx->mail->set(modMail::MAIL_FROM, $settings['email'] );
+        $this->modx->mail->set(modMail::MAIL_FROM_NAME, $settings['name'] );
+        $this->modx->mail->set(modMail::MAIL_SENDER, $settings['name'] );
         $this->modx->mail->set(modMail::MAIL_SUBJECT, $this->modx->lexicon('ditsnews.subscribers.confirm.subject'));
         $this->modx->mail->address('to', $subscriber->get('email') );
-        $this->modx->mail->address('reply-to', $settings->get('email') );
+        $this->modx->mail->address('reply-to', $settings['email'] );
         $this->modx->mail->setHTML(true);
         if (!$this->modx->mail->send()) {
              $this->modx->log(modX::LOG_LEVEL_ERROR,'An error occurred while trying to send the confirmation email to '.$subscriber->get('email'));
@@ -330,5 +350,19 @@ class Ditsnews {
             $chunk->setContent($o);
         }
         return $chunk;
+    }
+    /**
+     * Returns settings from modSystemSetting.
+     *
+     * @access public
+     * @return Array of settings
+     */
+    public function getSettings() {
+		$get_settings = $this->modx->getCollection('modSystemSetting', array('namespace' => 'ditsnews'));
+		$settings = array();
+		foreach ( $get_settings as $setting ) {
+			$settings[$setting->get('key')] = $setting->get('value');
+		}
+        return $settings;
     }
 }

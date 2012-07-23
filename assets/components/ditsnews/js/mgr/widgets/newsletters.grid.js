@@ -113,6 +113,7 @@ Ext.reg('ditsnews-grid-newsletters',Ditsnews.grid.Newsletters);
 Ditsnews.window.CreateNewsletter = function(config) {
     config = config || {};
     Ext.applyIf(config,{
+		id: 'ditsnews-window-newsletter-create',
         title: _('ditsnews.newsletters.new')
         ,url: Ditsnews.config.connectorUrl
         ,baseParams: {
