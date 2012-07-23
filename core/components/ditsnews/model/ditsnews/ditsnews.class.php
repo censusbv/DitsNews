@@ -140,8 +140,12 @@ class Ditsnews {
             $links = $dom->getElementsByTagName('a');
             foreach($links as $link) {
                 if( $href = $link->getAttribute('href') ) {
-                    if(substr($href, 0, 7) != 'http://' && substr($href, 0, 7) != 'mailto:') {
-                        $newhref = $site_url.$href;
+                    if(substr($href, 0, 7) != 'mailto:') {
+                        //add tracking vars for all urls
+						$newhref = $href;
+						if(substr($href, 0, 7) != 'http://') {
+							$newhref = $site_url.$href;
+						}
                         //add tracking vars
                         $newhref .= ( strpos($newhref, '?') ? '&amp;' : '?' );
                         $newhref .= 'nwl='.$qitem->get('newsletter');
