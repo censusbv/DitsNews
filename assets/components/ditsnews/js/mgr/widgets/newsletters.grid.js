@@ -4,7 +4,7 @@ Ditsnews.grid.Newsletters = function(config) {
         id: 'ditsnews-grid-newsletters'
         ,url: Ditsnews.config.connectorUrl
         ,baseParams: { action: 'mgr/newsletters/list' }
-        ,fields: ['id','title','date','total','sent']
+        ,fields: ['id','title','date','total','sent','attachment']
         ,paging: true
         ,autosave: true
         ,remoteSort: true
@@ -30,6 +30,10 @@ Ditsnews.grid.Newsletters = function(config) {
         },{
             header: _('ditsnews.newsletters.sent')
             ,dataIndex: 'sent'
+            ,sortable: false
+        },{
+            header: _('ditsnews.newsletters.attachment')
+            ,dataIndex: 'attachment'
             ,sortable: false
         }]
         ,tbar: [{
@@ -115,6 +119,7 @@ Ditsnews.window.CreateNewsletter = function(config) {
     Ext.applyIf(config,{
         title: _('ditsnews.newsletters.new')
         ,url: Ditsnews.config.connectorUrl
+        ,fileUpload: true
         ,baseParams: {
             action: 'mgr/newsletters/create'
         }
@@ -136,6 +141,14 @@ Ditsnews.window.CreateNewsletter = function(config) {
                 ,id: 'newslettergroups'
                 ,fieldLabel: _('ditsnews.newsletters.groups')
                 ,items: []
+            },{
+                xtype: 'textfield'
+                ,inputType: 'file'
+                ,id: 'newsletterattachment'
+                ,fieldLabel: _('ditsnews.newsletters.attachment')
+                ,name: 'attachment'
+                ,width: 300
+                ,allowBlank: true
             }
         ]
     });

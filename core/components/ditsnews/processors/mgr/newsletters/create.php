@@ -6,7 +6,7 @@ if($doc = $modx->getObject('modResource', $scriptProperties['document'])) {
     $context = $modx->getObject('modContext', array('key' => $doc->get('context_key')));
     $contextUrl = $context->getOption('site_url', $modx->getOption('site_url'));
     unset($context);
-    
+
     $message = file_get_contents($docUrl);
     $message = str_replace('&#91;&#91;', '[[', $message); //convert entities back to normal placeholders
     $message = str_replace('&#93;&#93;', ']]', $message); //convert entities back to normal placeholders
@@ -45,6 +45,62 @@ if($doc = $modx->getObject('modResource', $scriptProperties['document'])) {
         }
     }
 
+    //add attachment
+    $attachment = $scriptProperties['attachment'];
+    if (is_uploaded_file($attachment['tmp_name'])) {
+		$filepath = $modx->getOption('assets_path').'components/ditsnews/attachments/';
+		$aname = $attachment['name'];
+		$tname = $attachment['tmp_name'];
+
+		$tmp = explode('.', $aname);
+		$name = $tmp[0];
+		$ext = $tmp[1];
+
+		// verify file extension
+		$allowed_ext = explode(',', $modx->getOption('upload_files'));
+		if (!in_array($ext, $allowed_ext)) {
+			return $modx->error->failure($modx->lexicon('ditsnews.newsletters.err.wrongext'));
+		}
+
+		// clear filename by clear alias algorithm from modResource
+		$options = array();
+        $charset = strtoupper((string) $modx->getOption('modx_charset', $options, 'UTF-8'));
+        $delimiter = $modx->getOption('friendly_alias_word_delimiter', $options, '-');
+		$stripElementTags = (boolean) $modx->getOption('friendly_alias_strip_element_tags', $options, true);
+		$translit = $modx->getOption('friendly_alias_translit', $options, $iconv ? 'iconv' : 'none');
+		$translitClass = $modx->getOption('friendly_alias_translit_class', $options, 'translit.modTransliterate');
+
+        $name = $modx->stripTags($name, '', $stripElementTags ? array() : null);
+        $name = str_replace(' ', $delimiter, $name);
+        $name = html_entity_decode($name, ENT_QUOTES, $charset);
+
+        switch ($translit) {
+            case '':
+            case 'none': break;
+            case 'iconv': $name = iconv($mbext ? mb_detect_encoding($name) : $charset, $charset . '//TRANSLIT//IGNORE', $tmp[0]); break;
+            default:
+                $translitClassPath = $modx->getOption('friendly_alias_translit_class_path', $options, $modx->getOption('core_path', $options, MODX_CORE_PATH) . 'components/');
+                if ($modx->getService('translit', $translitClass, $translitClassPath, $options)) {
+                    $name = $modx->translit->translate($name, $translit);
+                }
+            break;
+        }
+        $name .= '.'.$ext;
+
+		if (file_exists($filepath.$name)) {
+			return $modx->error->failure($modx->lexicon('ditsnews.newsletters.err.fexists'));
+		}
+
+		if (!is_dir($filepath)) {
+			mkdir($filepath);
+		}
+
+        if (move_uploaded_file($tname, $filepath.$name)) {
+			$newsletter->set('attachment', $name);
+		}
+
+	}
+
     // Return values
     if ($newsletter->save()) {
         if(count($sendToGroups)) {
@@ -65,7 +121,8 @@ if($doc = $modx->getObject('modResource', $scriptProperties['document'])) {
                 $queueItem->save();
             }
         }
-        return $modx->error->success('', $newsletter);
+        //return $modx->error->success('', $newsletter);
+        return $modx->error->success('');
     } else {
         return $modx->error->failure('');
     }
